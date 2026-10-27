@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026학년도 2학기 학교생활기록부 점검 솔루션</title>
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-light: #3b82f6;
+      --primary-dark: #1e3a8a;
+      --success: #059669;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --bg-slate: #f8fafc;
+      --border: #e2e8f0;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #fff;
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+
+    /* 1. 네비게이션 */
+    header.navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+    }
+    .logo {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .nav-links a:hover {
+      color: var(--primary-dark);
+    }
+    .btn-cta {
+      background: var(--primary-dark);
+      color: white !important;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .btn-cta:hover {
+      background: var(--primary-light) !important;
+    }
+
+    /* 2. Hero 섹션 */
+    .hero {
+      padding: 70px 24px 50px;
+      text-align: center;
+      background: radial-gradient(circle at top, #eff6ff 0%, #ffffff 80%);
+    }
+    .badge-hero {
+      display: inline-block;
+      background: #dbeafe;
+      color: var(--primary-dark);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 9999px;
+      margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+      line-height: 1.35;
+    }
+    .hero p {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 720px;
+      margin: 0 auto 28px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .btn-lg {
+      padding: 13px 26px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--primary-dark);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 14px rgba(30, 58, 138, 0.2);
+    }
+    .btn-secondary {
+      background: white;
+      color: var(--text-dark);
+      border: 1px solid var(--border);
+    }
+
+    /* 3. 대시보드 데모 영역 */
+    .demo-section {
+      padding: 40px 20px 80px;
+      background: #f1f5f9;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .section-header h2 {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 14.5px;
+    }
+
+    /* 메인 대시보드 박스 */
+    .dashboard-preview {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* 상단 배너 */
+    .header-card {
+      background: linear-gradient(135deg, #2563eb, #1e3a8a);
+      color: white;
+      padding: 24px 28px;
+      border-radius: 12px;
+    }
+    .badge-pill {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+    .header-card h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .header-meta {
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+
+    /* 학년/반 칩 배지 영역 */
+    .filter-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .grade-tabs {
+      display: flex;
+      gap: 8px;
+    }
+    .grade-tab {
+      padding: 6px 16px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .grade-tab.active {
+      background: var(--primary-dark);
+      color: white;
+      border-color: var(--primary-dark);
+    }
+    .class-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .badge {
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+    .badge-done { background: #059669; color: white; }
+    .badge-need-fix { background: #fee2e2; color: #dc2626; border: 1px solid #f87171; }
+    .badge-idle { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+
+    /* 업로드 영역 */
+    .upload-zone {
+      background: #f8fafc;
+      border: 2px dashed #93c5fd;
+      border-radius: 12px;
+      padding: 22px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .upload-zone:hover {
+      background: #eff6ff;
+      border-color: #2563eb;
+    }
+    .upload-zone input { display: none; }
+    .upload-title { font-size: 15px; font-weight: 700; color: var(--primary-dark); }
+    .upload-desc { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
+
+    /* 상태 알림 배너 */
+    .alert-banner {
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .alert-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 3px;
+    }
+    .alert-badge {
+      background: white;
+      border: 1px solid #ef4444;
+      color: #b91c1c;
+      padding: 1px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+    }
+    .alert-desc {
+      font-size: 13.5px;
+      color: #92400e;
+    }
+
+    /* 4종 요약 지표 카드 */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .summary-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .summary-card .label { font-size: 12.5px; color: var(--text-muted); margin-bottom: 4px; }
+    .summary-card .value { font-size: 24px; font-weight: 800; display: flex; align-items: baseline; gap: 2px; }
+    .summary-card .value span { font-size: 14px; font-weight: 500; }
+    .val-total { color: #1e293b; }
+    .val-success { color: #059669; }
+    .val-danger { color: #dc2626; }
+    .val-warning { color: #d97706; }
+
+    /* 서브 탭 */
+    .tabs-nav {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .tab-btn {
+      padding: 12px 16px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      color: #2563eb;
+      border-bottom-color: #2563eb;
+    }
+
+    /* 점검 상세 테이블 */
+    .table-container {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    th {
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .td-num {
+      width: 50px;
+      text-align: center;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .td-title {
+      width: 320px;
+      font-weight: 600;
+      color: #1e293b;
+      line-height: 1.5;
+    }
+    .td-desc {
+      color: #475569;
+      line-height: 1.5;
+    }
+    .td-status {
+      width: 90px;
+      text-align: center;
+    }
+    .status-tag {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .status-ok { background: #ecfdf5; color: #059669; }
+    .status-fail { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+    /* 차수 히스토리 */
+    .history-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .history-chips {
+      display: flex;
+      gap: 8px;
+    }
+    .history-chip {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 6px 14px;
+      text-align: center;
+      font-size: 12px;
+    }
+    .history-chip strong { display: block; font-size: 13px; }
+    .history-chip.active { background: #7c3aed; color: white; border-color: #7c3aed; }
+
+    footer.page-footer {
+      border-top: 1px solid var(--border);
+      padding: 30px 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 850px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero h1 { font-size: 28px; }
+      header.navbar { padding: 14px 20px; }
+      .td-title { width: 220px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. 상단 네비게이션 -->
+  <header class="navbar">
+    <div class="logo">
+      <span>📑</span> 학생부 클린체크 2026
+    </div>
+    <div class="nav-links">
+      <a href="#demo">점검 대시보드 체험</a>
+      <a href="#demo" class="btn-cta">파일 업로드 점검</a>
+    </div>
+  </header>
+
+  <!-- 2. Hero 섹션 -->
+  <section class="hero">
+    <div class="badge-hero">2026학년도 학교생활기록부 기재요령 24대 필수 원칙 전수 점검</div>
+    <h1>2026학년도 2학기<br>학교생활기록부 점검 자동화 솔루션</h1>
+    <p>
+      사교육 유발 요인부터 고교 블라인드, 서술형 문장 종결 규칙, 바이트 초과까지 한 번에!<br>
+      수작업 확인의 번거로움 없이 <strong>24개 항목 전수 검토 후 수정사항만 즉시 안내</strong>합니다.
+    </p>
+    <div class="hero-actions">
+      <a href="#demo" class="btn-lg btn-primary">학생부 점검 시작하기</a>
+      <a href="#demo" class="btn-lg btn-secondary">체크리스트 24종 확인</a>
+    </div>
+  </section>
+
+  <!-- 3. 점검 대시보드 데모 영역 -->
+  <section class="demo-section" id="demo">
+    <div class="section-header">
+      <h2>학교생활기록부 점검 대시보드</h2>
+      <p>파일을 올리면 기재 가이드라인 24개 검토 기준에 따른 이상 유무를 즉시 분석합니다.</p>
+    </div>
+
+    <div class="dashboard-preview">
+
+      <!-- 상단 배너 -->
+      <div class="header-card">
+        <div class="badge-pill">2026학년도 2학기 · 학생부 점검</div>
+        <h2>2026학년도 2학기 학교생활기록부 점검</h2>
+        <div class="header-meta">
+          대부고등학교 · 1학년 2반 · 1차 기재 점검 2026. 10. 15. · 2차 점검 2026. 10. 22. · 최종 마감 점검 2026. 10. 27.
+        </div>
+      </div>
+
+      <!-- 학년 / 반 필터 바 -->
+      <div class="filter-card">
+        <div class="grade-tabs">
+          <button class="grade-tab active">1학년</button>
+          <button class="grade-tab">2학년</button>
+          <button class="grade-tab">3학년</button>
+        </div>
+        <div class="class-badges">
+          <span class="badge badge-done">[완] 1반 (담임)</span>
+          <span class="badge badge-need-fix">⚠️ 2반 (점검 필요)</span>
+          <span class="badge badge-done">[완] 3반 (담임)</span>
+          <span class="badge badge-idle">4반</span>
+          <span class="badge badge-idle">5반</span>
+          <span class="badge badge-done">[완] 자율활동</span>
+          <span class="badge badge-done">[완] 동아리활동</span>
+          <span class="badge badge-need-fix">⚠️ 진로활동</span>
+          <span class="badge badge-need-fix">⚠️ 교과세특</span>
+        </div>
+      </div>
+
+      <!-- 파일 업로드 영역 -->
+      <div class="upload-zone" onclick="document.getElementById('demoFileInput').click()">
+        <input type="file" id="demoFileInput" accept=".xlsx, .xls, .hwp, .pdf, .csv" onchange="runCheckDemo(event)">
+        <div class="upload-title" id="fileTitle">📂 점검할 학생부 파일(엑셀, HWP)을 업로드하세요</div>
+        <div class="upload-desc" id="fileDesc">클릭하거나 파일을 드래그하여 24개 기준 점검 알고리즘을 즉시 실행합니다.</div>
+      </div>
+
+      <!-- 검증 상태 배너 -->
+      <div class="alert-banner">
+        <div style="font-size:22px;">📌</div>
+        <div>
+          <div class="alert-title">
+            <span>2026 기재요령 점검 보고</span>
+            <span class="alert-badge" id="badgeReport">수정 필요 4건</span>
+          </div>
+          <div class="alert-desc" id="reportSummary">
+            <!-- JS로 주입됩니다 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 4종 요약 지표 카드 -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="label">점검 대상 항목</div>
+          <div class="value val-total" id="cntTotal">24<span>개</span></div>
+        </div>
+        <div class="summary-card">
+          <div class="label">적합 완료</div>
+          <div class="value val-success" id="cntPass">20<span>개</span></div>
+        </div>
+        <div class="summary-card">
+          <div class="label">수정 필요(이상)</div>
+          <div class="value val-danger" id="cntFail">4<span>건</span></div>
+        </div>
+        <div class="summary-card">
+          <div class="label">검토 잔여</div>
+          <div class="value val-warning">0<span>건</span></div>
+        </div>
+      </div>
+
+      <!-- 서브 탭 네비게이션 -->
+      <nav class="tabs-nav">
+        <button class="tab-btn active">기재 점검 체크리스트 (24개)</button>
+        <button class="tab-btn">금지어·불용어 목록</button>
+        <button class="tab-btn">바이트 한도 검증</button>
+        <button class="tab-btn">✍️ 수정 확인(담임/교과)</button>
+      </nav>
+
+      <!-- 상세 테이블 -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="td-num">번호</th>
+              <th class="td-title">검토 항목</th>
+              <th>검증 내용</th>
+              <th class="td-status">판정</th>
+            </tr>
+          </thead>
+          <tbody id="demoTableBody">
+            <!-- 24개 항목이 JS로 동적 렌더링됩니다 -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 하단 차수 히스토리 -->
+      <div class="history-card">
+        <div style="font-size: 13px; font-weight: 700; color: var(--text-muted);">📑 검토 차수:</div>
+        <div class="history-chips">
+          <div class="history-chip">
+            <strong>1검</strong>
+            2026-10-15
+          </div>
+          <div class="history-chip">
+            <strong>2검</strong>
+            2026-10-22
+          </div>
+          <div class="history-chip active">
+            <strong>3검</strong>
+            2026-10-27
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 하단 푸터 -->
+  <footer class="page-footer">
+    <p>© 2026 학교생활기록부 기재 점검 시스템 · 2026학년도 학교생활기록부 기재요령 표준 준수</p>
+  </footer>
+
+  <script>
+    // 사용자가 제시한 24개 검토 항목 전수 데이터
+    const checkRules = [
+      {
+        id: 1,
+        title: "사교육 유발 요인이 큰 사항 기재 금지",
+        desc: "공인어학성적, 교내·외 대회 성적, 모의고사 성적, 논문 투고, 도서 출간, 지식재산권, 어학연수, 부모 지위, 장학금, 기관명(유튜브, 인스타그램, 챗 GPT 등) 전수 점검 — 교과세특 1건에서 '챗 GPT를 활용하여...' 발견 (기재금지어 감지)",
+        status: "FAIL"
+      },
+      {
+        id: 2,
+        title: "(고교블라인드) 고등학교 식별 정보 기재 금지",
+        desc: "학교명, 재단명, 학교 축제명, 학교 별칭 등 출신 고교 유추 가능 단어 전수 점검 — 미검출",
+        status: "PASS"
+      },
+      {
+        id: 3,
+        title: "동일 문구 반복 및 1인칭 서술형 표현 금지",
+        desc: "복수 학생 간 세특 복사/붙여넣기 및 '나는~', '내가~' 형태의 1인칭 주어 서술형 표현 전수 검출 — 미검출",
+        status: "PASS"
+      },
+      {
+        id: 4,
+        title: "교사 관찰 불가 내용(아르바이트, 교외 봉사) 배제",
+        desc: "학교 교육계획 이외의 교외 아르바이트, 외부 개인 봉사활동 등 교사 직접 관찰 불가 영역 기재 여부 점검 — 미검출",
+        status: "PASS"
+      },
+      {
+        id: 5,
+        title: "문자 입력 규칙(한글 입력 원칙)",
+        desc: "한글 입력 원칙 준수 여부(부득이한 공식 영문 고유명사 외 부적합 외국어 혼용 여부) — 적합",
+        status: "PASS"
+      },
+      {
+        id: 6,
+        title: "특수문자 및 문단구분 기호 입력 지양 규칙",
+        desc: "기재 가능 기호: ' , . ( ) / 기재 불가능 기호: ·, ‘ ’, “ ”, ?, ! 점검 — 정보 세특 1건에서 큰따옴표(\" \") 및 물음표(?) 사용 감지",
+        status: "FAIL"
+      },
+      {
+        id: 7,
+        title: "서술형 문장의 명사형 종결어미 종결 여부",
+        desc: "모든 서술형 항목의 문장이 명사형 종결어미(~함, ~임, ~을 보임 등)로 바르게 마감되었는지 전수 검사 — 전체 100% 명사형 종결 일치",
+        status: "PASS"
+      },
+      {
+        id: 8,
+        title: "학적변동 사유 명시(자퇴·휴학·유급 등)",
+        desc: "해당 기간 내 학적변동자 1명 사유 기재 여부 확인 — '2026.06.19. 가정 사정으로 자퇴' 정확히 기재됨",
+        status: "PASS"
+      },
+      {
+        id: 9,
+        title: "(특기사항) 기타결석 사유 기재 여부",
+        desc: "출결 특기사항 란 내 기타결석 학생의 발생 사유 명시 여부 확인 — 전원 사유 명시 확인",
+        status: "PASS"
+      },
+      {
+        id: 10,
+        title: "(특기사항) 질병·미인정 7일 이상 연속결석 사유 및 일수",
+        desc: "연속 7일 이상 결석자(질병·미인정)의 사유와 결석 일수 기재 여부 점검 — '골절수술(8일)' 등 포맷 일치",
+        status: "PASS"
+      },
+      {
+        id: 11,
+        title: "'대회' 용어 사용 금지",
+        desc: "본문 전 영역 내 '대회' 단어 검색 — 진로활동 1건에서 '교내 토론대회 참여' 표기 발견 ('교내 탐구활동' 등으로 수정 필요)",
+        status: "FAIL"
+      },
+      {
+        id: 12,
+        title: "고교 재학 중 취득 인정 자격증 기재 규정",
+        desc: "교육부장관 지정 고교 재학 중 취득 국가기술/공인 자격증 여부 대조 — 초·중학교 취득 이력 없음",
+        status: "PASS"
+      },
+      {
+        id: 13,
+        title: "학급자치회 임원 종류 및 재임기간 명시",
+        desc: "학급당 회장 1명, 부회장 1명 지정 및 재임기간 포맷(예: 1학기 학급회장(2026.03.01.-2026.08.15.)) 일치 여부 확인 완료",
+        status: "PASS"
+      },
+      {
+        id: 14,
+        title: "창체 0시간 이수자의 사유 명시 여부",
+        desc: "자율, 동아리, 진로 이수시간이 0시간인 학생의 사유(순회교육, 장기결석, 위탁 등) 필수 입력 대조 — 누락 0건",
+        status: "PASS"
+      },
+      {
+        id: 15,
+        title: "자치활동 임원 재임기간 규정 일치 여부",
+        desc: "1·2학년(3월 1일~학년말), 3학년(3월 1일~졸업일) 기준 재임기간 적정 기재 확인 완료",
+        status: "PASS"
+      },
+      {
+        id: 16,
+        title: "자율동아리 기재 규정(학년당 1개, 동아리명 한정)",
+        desc: "학교교육계획에 따라 학년당 1개 이내로 동아리명만(또는 소개 30자 이내) 입력되었는지 점검 완료",
+        status: "PASS"
+      },
+      {
+        id: 17,
+        title: "학교스포츠클럽 동아리활동 클럽명 표기 규칙",
+        desc: "정규과정 외 학교스포츠클럽 동아리 란에 클럽명 단독 기재 및 활동 시간/내용 중복 여부 점검 — 이상 없음",
+        status: "PASS"
+      },
+      {
+        id: 18,
+        title: "진로희망(희망분야)란 적정 입력 여부",
+        desc: "진로활동 특기사항 내 '희망분야' 란 입력 확인 — 미정인 학생도 '진로탐색 중임'으로 전원 누락 없이 입력됨",
+        status: "PASS"
+      },
+      {
+        id: 19,
+        title: "과목별 세특 전원 입력 여부 (모든 교과/전체 학생)",
+        desc: "1학년 2반 개설 과목의 모든 학생 대상 세특 공란 여부 전수 검사 — 국어, 영어, 수학, 통합사회, 통합과학 누락자 0명",
+        status: "PASS"
+      },
+      {
+        id: 20,
+        title: "성취기준·수준 기반 개별 성취특성 서술(단순 나열 지양)",
+        desc: "수업 활동순순 나열 방지 및 학생별 성취과정과 역량 중심 서술형 기술 여부 점검 완료",
+        status: "PASS"
+      },
+      {
+        id: 21,
+        title: "창체 활동과 교과세특 간 중복 기재 방지",
+        desc: "동일한 탐구 보고서/체험 활동 내용이 창의적 체험활동과 과목별 세특에 이중 기재되었는지 교차 대조 — 이상 없음",
+        status: "PASS"
+      },
+      {
+        id: 22,
+        title: "도서 입력 규칙 준수 여부 ('도서명(저자)' 형식)",
+        desc: "ISBN 등재 도서 확인 및 '도서명(저자)' 단독 형식 검증 — 1건에서 저자명 누락된 도서명만 단독 기재 발견",
+        status: "FAIL"
+      },
+      {
+        id: 23,
+        title: "[2026학년도 3학년만] 독서활동상황 중복 기재 검증",
+        desc: "동일한 책이 다른 학년 또는 다른 교과에 중복 기재되었는지 여부 시스템 교차 필터링 — 중복 0건",
+        status: "PASS"
+      },
+      {
+        id: 24,
+        title: "학생의 부정적 행동특성 입력 여부 확인",
+        desc: "행동특성 및 종합의견 란에 단순 낙인형 부정 서술 단독 기재 여부 점검 (변화 및 성장 가능성 중심으로 기재 확인)",
+        status: "PASS"
+      }
+    ];
+
+    // 표 렌더링 및 통계 계산
+    function renderDemoTable(items) {
+      const tbody = document.getElementById("demoTableBody");
+      tbody.innerHTML = "";
+
+      const total = items.length;
+      let pass = 0;
+      let fail = 0;
+
+      items.forEach(item => {
+        const isOk = item.status === "PASS";
+        if (isOk) pass++; else fail++;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="td-num">${item.id}</td>
+          <td class="td-title">${item.title}</td>
+          <td class="td-desc">${item.desc}</td>
+          <td class="td-status">
+            <span class="status-tag ${isOk ? 'status-ok' : 'status-fail'}">
+              ${isOk ? '적합' : '수정필요'}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // 4종 수치 카드 반영
+      document.getElementById("cntTotal").innerHTML = `${total}<span>개</span>`;
+      document.getElementById("cntPass").innerHTML = `${pass}<span>개</span>`;
+      document.getElementById("cntFail").innerHTML = `${fail}<span>건</span>`;
+
+      // 핵심 안내 문구 ("점검할 항목 n개 중 n개 점검했고, 수정사항은 a개")
+      const reportDesc = document.getElementById("reportSummary");
+      const badgeReport = document.getElementById("badgeReport");
+
+      if (fail > 0) {
+        badgeReport.textContent = `수정 필요 ${fail}건`;
+        badgeReport.style.borderColor = "#ef4444";
+        badgeReport.style.color = "#b91c1c";
+        reportDesc.innerHTML = 
+          `점검할 항목 <strong>${total}개 중 ${total}개</strong>를 점검 완료하였으며, 수정해야 할 항목은 <strong>${fail}개</strong>입니다. (하단 표의 붉은색 표시 항목을 확인하세요)`;
+      } else {
+        badgeReport.textContent = `전 항목 적합`;
+        badgeReport.style.borderColor = "#10b981";
+        badgeReport.style.color = "#047857";
+        reportDesc.innerHTML = 
+          `점검할 항목 <strong>${total}개 중 ${total}개</strong>를 점검 완료하였으며, <strong>수정사항은 0개</strong>입니다.`;
+      }
+    }
+
+    // 파일 업로드 시뮬레이션
+    function runCheckDemo(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      document.getElementById("fileTitle").innerText = `📄 업로드 및 분석 완료: ${file.name}`;
+      document.getElementById("fileDesc").innerText = "2026 기재요령 24개 체크리스트 검증을 마쳤습니다.";
+      renderDemoTable(checkRules);
+    }
+
+    // 초기 실행
+    window.addEventListener("DOMContentLoaded", () => {
+      renderDemoTable(checkRules);
+    });
+  </script>
+</body>
+</html>
